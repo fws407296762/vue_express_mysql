@@ -1,3 +1,31 @@
 module.exports = {
-    entry:""
+    entry:{
+        main:"./src/js/main.js"
+    },
+    output:{
+        path:__dirname,
+        filename:'public/js/[name].build.js'
+    },
+    module:{
+        loaders:[
+            {
+                test:/\.vue$/,
+                loader:'vue'
+            },
+            {
+                test:/\.js$/,
+                loader:'babel-loader',
+                exclude:/node_modules/
+            }
+        ]
+    },
+    vue:{
+        loaders:{
+            scss:"sass"
+        }
+    },
+    babel:{
+        presets:['es2015'],
+        plugins:['transform-runtime']
+    }
 }

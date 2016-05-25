@@ -3,9 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>{{goble.title}}</title>
-    <script src="/public/js/lib/vue.js"></script>
 </head>
 <body>
-    
+    <v-nav></v-nav>
+    <v-app></v-app>
+    <div class="app" id="app">
+        <router-view></router-view>
+    </div>
+    <script src="/ap/js/main.build.js"></script>
 </body>
 </html>
