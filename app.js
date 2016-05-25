@@ -5,7 +5,7 @@ let app = express();
 let adminRouter = require("./admin/router");
 app.set('views',[path.join(__dirname,'/admin/views')]);
 app.set("view engine",'ejs');
-
+app.use('/ap',express.static('admin/public'));
 app.use("/admin",adminRouter);
 
 app.listen(3000);
