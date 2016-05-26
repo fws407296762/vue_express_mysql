@@ -2,6 +2,7 @@
     <ul class="nav">
         <li v-for="n in nav"><a v-link="{path:n.url}" v-text="n.name"></a></li>
     </ul>
+    <router-view></router-view>
 </template>
 
 <style lang="sass" scoped>

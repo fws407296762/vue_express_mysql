@@ -1,0 +1,9 @@
+@import "normalize";
+@import "../mixins/index";
+
+body{
+    font-family: $font-family;
+}
+.clearfix{
+    @include clearfix;
+}

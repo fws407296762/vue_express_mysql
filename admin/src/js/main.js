@@ -1,34 +1,11 @@
+import "../scss/index.scss";
 import Vue from "./lib/vue.min";
 import VueRouter from "./lib/vue-router.min";
-Vue.use(VueRouter);
+import {configRouter} from "../../vue/router";
 import VApp from '../../vue/app.vue';
-import VNav from '../../vue/nav.vue';
 
-Vue.config.debug = true;
+Vue.use(VueRouter);
 
-let App = Vue.extend({});
-let router = new VueRouter();
-
-var Foo = Vue.extend({
-    template: '<p>This is foo!</p>'
-})
-var Bar = Vue.extend({
-    template: '<p>This is bar!</p>'
-})
-router.map({
-    "/":{
-        component:Foo
-    },
-    "/news":{
-        component:Bar
-    },
-})
-router.start(App,"#app");
-
-new Vue({
-    el:"body",
-    components:{
-        VApp:VApp,
-        VNav:VNav
-    }
-})
+const router = new VueRouter({});
+configRouter(router);
+router.start(Vue.extend(VApp),"#root");
