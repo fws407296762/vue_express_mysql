@@ -2,7 +2,9 @@
     <header class="header clearfix">
         <h1 class="logo">松鼠闹IT</h1>
     </header>
-    <router-view></router-view>
+    <div class="main-container">
+        <router-view></router-view>
+    </div>
 </template>    
 
 <style lang="sass" scoped>
@@ -16,6 +18,17 @@
         margin: 0;
         font-size: 24px;
         font-weight: normal;
+    }
+    .main-container:before{
+        display: block;
+        content: "";
+        position: absolute;
+        z-index: -2;
+        width: 100%;
+        max-width: inherit;
+        bottom: 0;
+        top: 0;
+        background: #fff;
     }
 </style>
 

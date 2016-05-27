@@ -1,11 +1,22 @@
 <template>
-    <div class="wrapper">
-        <h1>这个是新闻页面</h1>
+    <div class="page-content">
+        <div class="page-header">
+            <h1>今日新闻</h1>
+        </div>
+        
     </div>
 </template>
 
 <script>
     export default {
-        
+        ready () {
+            this.$http({
+                url:"/admin/getNews"
+            }).then(function(data){
+                console.log(data)
+            },function(err){
+                console.log(err);
+            })
+        }
     }
 </script>
