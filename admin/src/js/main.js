@@ -1,8 +1,9 @@
 import Vue from "./lib/vue.min";
 import VueRouter from "./lib/vue-router.min";
 Vue.use(VueRouter);
-import VApp from '../../vue/app.vue';
 import VNav from '../../vue/nav.vue';
+import VApp from '../../vue/app.vue';
+
 
 Vue.config.debug = true;
 
