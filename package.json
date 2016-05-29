@@ -9,7 +9,8 @@
     "mysql": "^2.10.2",
     "vue": "^1.0.24",
     "vue-resource": "^0.7.2",
-    "vue-router": "^0.7.13"
+    "vue-router": "^0.7.13",
+    "webpack-dev-middleware": "^1.6.1"
   },
   "devDependencies": {
     "babel-core": "^6.3.17",

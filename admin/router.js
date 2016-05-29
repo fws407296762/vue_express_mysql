@@ -13,21 +13,21 @@ router.get("/getNews",function(req,res){
         method:"GET"
     }
     let request = http.request(options,(_res)=>{
-        let c = '';
-        console.log(options)
+        let c = "";
+        _res.setEncoding("utf8");
         _res.on('data',(chunk)=>{
-            c += chunk.toString();
+            c += chunk;
         });
         _res.on('end',()=>{
-            
-            res.end(c);
-        })
+            res.send(c);
+            res.end();
+        });
     });
-    
     request.on("error",(err)=>{
         res.end(err.message);
     });
     request.end();
-})
+});
+
 
 module.exports = router;
