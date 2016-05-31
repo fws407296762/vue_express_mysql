@@ -32,7 +32,7 @@ router.get("/getNews",function(req,res){
                     currentPage = parseInt(pagebean.currentPage),
                     maxResult = parseInt(pagebean.maxResult);
                 
-                connection.query("INSERT INTO news(title,imgurl,content,datatime,type)")
+                // connection.query("INSERT INTO news(title,imgurl,content,datatime,type)")
             }
             send['code'] = code;
             send['error'] = error;
