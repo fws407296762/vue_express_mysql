@@ -14,21 +14,64 @@ connection.on("error",function(err){
 //     sql:"CREATE DATABASE IF NOT EXISTS " + options.database +" default character set utf8 COLLATE utf8_general_ci;"
 // }
 
-let queryOptions = {
-   "sql":"SELECT SCHEMA_NAME FROM `information_schema`.`SCHEMATA` where SCHEMA_NAME='vue'"
+let sql = {
+    "hasDatabase":{
+        "sql":"SELECT SCHEMA_NAME FROM `information_schema`.`SCHEMATA` where SCHEMA_NAME='"+options.database+"';"
+    },
+    "createDatabase":{
+        "sql":"CREATE DATABASE IF NOT EXISTS "+options.database+" default character set utf8 COLLATE utf8_general_ci;"  
+    },
+    "useDatabase":{
+        "sql":"USE "+options.database
+    },
+    "createTableNews":{
+        "sql":"CREATE TABLE IF NOT EXISTS news"
+                +"("
+                + "id INT NOT NULL AUTO_INCREMENT,"
+                + "title VARCHAR(255) NOT NULL,"
+                + "imgurl VARCHAR(255),"
+                + "type INT NOT NULL,"
+                + "PRIMARY KEY (id)"    
+                +");"
+    },
+    "createTableChannel":{
+        "sql":"CREATE TABLE IF NOT EXISTS channel"
+                + "("
+                + "channel VARCHAR(200) NOT NULL"
+    }
 }
-let query = connection.query(queryOptions);
-query.on("error",function(err){
+
+queryAsync(sql.hasDatabase).then(function(result){
+    let len = result.length;
+    if(!len){
+        return queryAsync(sq.createDatabase)
+    }
+}).then(function(result){
+    console.log("创建"+options.database+"成功");
+    return queryAsync(sql.useDatabase)
+}).then(function(result){
+    console.log("使用"+options.database+"数据库");
+    return Promise.all([
+        queryAsync(sql.createTableNews)
+    ]);
+}).then(function(result){
+    console.log(result);
+}).catch(function(err){
     console.log(err);
-}).on("result",function(row){
-    console.log(row);
-}).on("fields",function(fields,index){
-    console.log(fields,index);
-}).on("end",function(){
-    
 });
 
-connection.end();
+
+function queryAsync(options){
+    return new Promise(function(resolve,reject){
+        connection.query(options,function(err,result){
+            if(err){
+                reject(err);
+                return false;
+            }
+            resolve(result);
+        });
+    })
+}
 
 module.exports = connection;
 
