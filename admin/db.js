@@ -1,7 +1,6 @@
 const mysql = require("mysql");
-const config = require("../config");
+const config = require("./config");
 let options = config.Mysql;
-
 
 let connection = mysql.createConnection(options);
 options.database = "vue";
@@ -29,36 +28,50 @@ let sql = {
                 +"("
                 + "id INT NOT NULL AUTO_INCREMENT,"
                 + "title VARCHAR(255) NOT NULL,"
-                + "imgurl VARCHAR(255),"
-                + "type INT NOT NULL,"
-                + "PRIMARY KEY (id)"    
+                + "description LONGTEXT,"
+                + "imgurls VARCHAR(255),"
+                + "channelId VARCHAR(200) NOT NULL,"
+                + "channelName VARCHAR(200) NOT NULL,"
+                + "content LONGTEXT NOT NULL,"
+                + "html LONGTEXT NOT NULL,"
+                + "sourceurl VARCHAR(255),"
+                + "source VARCHAR(255),"
+                + "datetime DATETIME NOT NULL,"
+                + "PRIMARY KEY (id),"
+                + "UNIQUE KEY `title` (`title`)"    
                 +");"
     },
     "createTableChannel":{
         "sql":"CREATE TABLE IF NOT EXISTS channel"
                 + "("
-                + "channel VARCHAR(200) NOT NULL"
+                + "channelId VARCHAR(200) NOT NULL,"
+                + "channelName VARCHAR(200) NOT NULL,"
+                + "PRIMARY KEY (channelId)"
+                + ");"
     }
 }
 
 queryAsync(sql.hasDatabase).then(function(result){
     let len = result.length;
     if(!len){
-        return queryAsync(sq.createDatabase)
+        return queryAsync(sql.createDatabase)
     }
 }).then(function(result){
     console.log("创建"+options.database+"成功");
-    return queryAsync(sql.useDatabase)
+    return queryAsync(sql.useDatabase);
 }).then(function(result){
     console.log("使用"+options.database+"数据库");
     return Promise.all([
-        queryAsync(sql.createTableNews)
+        queryAsync(sql.createTableNews),
+        queryAsync(sql.createTableChannel)
     ]);
 }).then(function(result){
-    console.log(result);
+    console.log("数据库初始化成功");
+    connection.end();
 }).catch(function(err){
     console.log(err);
 });
+
 
 
 function queryAsync(options){
@@ -73,7 +86,7 @@ function queryAsync(options){
     })
 }
 
-module.exports = connection;
+
 
 
 

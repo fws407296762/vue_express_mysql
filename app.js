@@ -3,11 +3,9 @@ const path = require("path");
 let ejs = require("ejs");
 let app = express();
 let adminRouter = require("./admin/router");
-let dbRouter = require("./admin/dbRouter");
 app.set('views',[path.join(__dirname,'/admin/views')]);
 app.set("view engine",'ejs');
 app.use('/ap',express.static('admin/public'));
 app.use("/admin",adminRouter);
-app.use("/db",dbRouter);
 
 app.listen(3000);

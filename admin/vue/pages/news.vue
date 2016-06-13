@@ -11,9 +11,13 @@
     export default {
         ready () {
             this.$http({
-                url:"/admin/getNews"
+                url:"/admin/getNews",
+                data:{
+                    page:2,
+                    pageno:10
+                }
             }).then(function(data){
-                console.log(data)
+                console.log(data);
             },function(err){
                 console.log(err);
             })
