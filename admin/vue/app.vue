@@ -2,7 +2,7 @@
     <header class="header clearfix">
         <h1 class="logo">松鼠闹IT</h1>
     </header>
-    <div class="main-container">
+    <div class="main-container clearfix">
         <router-view></router-view>
     </div>
 </template>    

@@ -1,0 +1,19 @@
+*,:before, :after{box-sizing: border-box;}
+body{font-family: "Microsoft YaHei","微软雅黑";font-size: 14px;}
+body,div,h1{margin: 0;}
+
+a{text-decoration: none;}
+.clearfix:after,.clearfix:before{content:" ";display: table;}
+.clearfix:after{clear: both;}
+.clearfix{*zoom:1;}
+
+/*文本样式*/
+.tac{text-align: center;}
+.tal{text-align: left;}
+.tar{text-align: right;}
+
+.page-content{padding: 10px 15px;}
+.page-header{border-bottom: 1px solid #ccc;padding-bottom: 10px;}
+.page-header h1{font-size: 24px;font-weight: normal;color: #2db7f5;}
+
+.page-body{padding: 15px 10px;}

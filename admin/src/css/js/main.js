@@ -1,4 +1,4 @@
-import "../css/admin.css";
+import "../scss/index.scss";
 import Vue from "./lib/vue.min";
 import VueRouter from "./lib/vue-router.min";
 import VueResource from "./lib/vue-resource.min"

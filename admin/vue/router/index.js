@@ -8,6 +8,9 @@ export function configRouter(router) {
                 },
                 "/news":{
                     component:require("../pages/news.vue")
+                },
+                "/news/:id":{
+                    component:require("../pages/newsConetnt.vue")
                 }
             }
         }
