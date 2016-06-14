@@ -15,15 +15,18 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="n in news">
+                    <tr v-if="news.length" v-for="n in news">
                         <td><a href="#/news/{{n.id}}" v-text="n.title"></a></td>
-                        <td class="tac"><span class="channel-name" v-text="n.channelName"></span></td>
+                        <td class="tac cgray" v-text="n.channelName"></td>
                         <td class="tac"><a :href="n.link" target="_blank" v-text="n.source"></a></td>
-                        <td class="tac" v-text="n.datetime"></td>
-                        <td class="tac">
-                            <button>编辑</button>
-                            <button>删除</button>
+                        <td class="tac cgray" v-text="n.datetime"></td>
+                        <td class="tac action-box">
+                            <button class="iconfont icon-edit"></button>
+                            <button class="iconfont icon-delete"></button>
                         </td>
+                    </tr>
+                    <tr v-if="!news.length">
+                        <td colspan="5" class="tac" v-text="loading"></td>
                     </tr>
                 </tbody>
             </table>
@@ -37,6 +40,8 @@
     .data-table th{background: #f3f3f3;}
     .data-table a{color: #0885bd;}
     .channel-name{color: #666;}
+    .action-box button{color: #666;cursor: pointer;}
+    .action-box button:hover{color: #333;}
 </style>
 
 <script>
@@ -66,13 +71,13 @@
                 let news = data.data;
                 news = news.map(function(item){
                     let date = new Date(item.datetime).toLocaleString();
-                    console.log(date)
+                    console.log(item.datetime)
                     return item;
                 })
                 self.news = news;
             }).catch(function(err){
                 console.log(err);
-            })
+            });
         }
     }
 </script>
