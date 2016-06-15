@@ -1,8 +1,10 @@
 *,:before, :after{box-sizing: border-box;}
+html{min-height:100%;position: relative;}
 body{font-family: "Microsoft YaHei","微软雅黑";font-size: 14px;}
 body,div,h1{margin: 0;}
 
 a{text-decoration: none;}
+a:hover{color: #065679;}
 .clearfix:after,.clearfix:before{content:" ";display: table;}
 .clearfix:after{clear: both;}
 .clearfix{*zoom:1;}
@@ -35,7 +37,7 @@ a{text-decoration: none;}
 .tac{text-align: center;}
 .tal{text-align: left;}
 .tar{text-align: right;}
-.cgray{color: #666;}
+.cgray{color: #999;}
 
 .page-content{padding: 10px 15px;}
 .page-header{border-bottom: 1px solid #ccc;padding-bottom: 10px;}

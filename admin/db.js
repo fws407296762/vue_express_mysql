@@ -29,11 +29,10 @@ let sql = {
                 + "id INT NOT NULL AUTO_INCREMENT,"
                 + "title VARCHAR(255) NOT NULL,"
                 + "description LONGTEXT,"
-                + "imgurls VARCHAR(255),"
+                + "imageurls VARCHAR(255),"
                 + "channelId VARCHAR(200) NOT NULL,"
                 + "channelName VARCHAR(200) NOT NULL,"
                 + "content LONGTEXT NOT NULL,"
-                + "html LONGTEXT NOT NULL,"
                 + "sourceurl VARCHAR(255),"
                 + "source VARCHAR(255),"
                 + "datetime DATETIME NOT NULL,"
@@ -49,7 +48,7 @@ let sql = {
                 + "PRIMARY KEY (channelId)"
                 + ");"
     }
-}
+};
 
 queryAsync(sql.hasDatabase).then(function(result){
     let len = result.length;

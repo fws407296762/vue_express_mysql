@@ -16,7 +16,7 @@
                 </thead>
                 <tbody>
                     <tr v-if="news.length" v-for="n in news">
-                        <td><a href="#/news/{{n.id}}" v-text="n.title"></a></td>
+                        <td><a v-link="{path:'/news/page',query:{id:n.id}}" v-text="n.title"></a></td>
                         <td class="tac cgray" v-text="n.channelName"></td>
                         <td class="tac"><a :href="n.link" target="_blank" v-text="n.source"></a></td>
                         <td class="tac cgray" v-text="n.datetime"></td>
@@ -39,8 +39,8 @@
     .data-table th,.data-table td{height: 36px;padding-left: 10px;padding-right: 10px;border-bottom: 1px solid #ddd;}
     .data-table th{background: #f3f3f3;}
     .data-table a{color: #0885bd;}
-    .channel-name{color: #666;}
-    .action-box button{color: #666;cursor: pointer;}
+    .channel-name{color: #999;}
+    .action-box button{color: #999;cursor: pointer;}
     .action-box button:hover{color: #333;}
 </style>
 
@@ -55,7 +55,7 @@
         ready () {
             let self = this;
             this.$http({
-                url:"/admin/getNews",
+                url:"/admin/getNewsList",
                 data:{
                     page:1,
                     pageno:10
@@ -69,11 +69,6 @@
                 let code = parseInt(data.code),
                     msg = data.msg;
                 let news = data.data;
-                news = news.map(function(item){
-                    let date = new Date(item.datetime).toLocaleString();
-                    console.log(item.datetime)
-                    return item;
-                })
                 self.news = news;
             }).catch(function(err){
                 console.log(err);

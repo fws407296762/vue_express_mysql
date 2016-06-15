@@ -9,7 +9,12 @@ export function configRouter(router) {
                 "/news":{
                     component:require("../pages/news.vue")
                 },
-                "/news/:id":{
+                "/news/:channelid":{
+                    name:"newsChannel",
+                    component:require("../pages/news.vue")
+                },
+                "/news/page":{
+                    name:"newsContent",
                     component:require("../pages/newsConetnt.vue")
                 }
             }

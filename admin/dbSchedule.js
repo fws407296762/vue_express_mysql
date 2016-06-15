@@ -124,15 +124,24 @@ function insertNews(result) {
             imgurls = item.imageurls[0] && item.imageurls[0].url || "",
             channelId = item.channelId,
             channelName = item.channelName,
-            content = item.content || "",
             html = item.html || "",
             sourceurl = item.link || "",
             source = item.source || "",
-            datetime = item.pubDate;
-        dbSchedule.queryAsync("INSERT INTO news (title,description,imgurls,channelId,channelName,content,html,sourceurl,source,datetime) VALUES ('" + title + "','" + description + "','" + imgurls + "','" + channelId + "','" + channelName + "','" + content + "','" + html + "','" + sourceurl + "','" + source + "','" + datetime + "');").then(function (result) {
+            datetime = item.pubDate,
+            allList = item.allList;
+        let content = "";
+        allList.forEach(function (item) {
+            let isObject = common.isObject(item);
+            if (isObject) {
+                content += '<p class="image"><img style="width:' + item.width + 'px;height:' + item.height + 'px" src="' + item.url + '"></p>'
+                return;
+            }
+            content += '<p>' + item + '</p>';
+        });
+        dbSchedule.queryAsync("INSERT INTO news (title,description,imageurls,channelId,channelName,content,sourceurl,source,datetime) VALUES ('" + title + "','" + description + "','" + imgurls + "','" + channelId + "','" + channelName + "','" + content + "','" + sourceurl + "','" + source + "','" + datetime + "');").then(function (result) {
             console.log(title + ":插入数据成功");
         }).catch(function (err) {
-            console.log(title + ":插入数据失败");
+            console.log(err);
         });
     });
 }
