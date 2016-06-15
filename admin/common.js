@@ -1,4 +1,6 @@
 
+const fs = require("fs");
+const http = require("http");
 const DATATYPES = ['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp', 'Error','Object'];
 
 let common = {};
@@ -22,7 +24,17 @@ common.getTimesTamp = function(){
         minutes = date.getMinutes() < 10 ? '0'+date.getMinutes():date.getMinutes(),
         seconds = date.getSeconds() < 10 ? '0'+date.getSeconds() : date.getSeconds();
     return ''+year+month+day+hours+minutes+seconds;
-}
+};
 
+common.download = function(src){
+    let dir = '/upload/';
+    let date = new Date();
+    let year = date.getFullYear(),
+        month = date.getMonth() + 1 < 10 ? '0'+(date.getMonth() + 1) : date.getMonth() + 1, 
+        day = date.getDate() < 10 ? '0'+date.getDate() : date.getDate();
+    dir = dir+"/"+year+"/"+month+"/"+day+"/";
+    
+};
+common.download();
 module.exports = common;
 

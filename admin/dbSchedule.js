@@ -121,7 +121,6 @@ function insertNews(result) {
     contentlist.forEach(function (item, index) {
         let title = item.title,
             description = item.desc || "",
-            imgurls = item.imageurls[0] && item.imageurls[0].url || "",
             channelId = item.channelId,
             channelName = item.channelName,
             html = item.html || "",
@@ -129,20 +128,25 @@ function insertNews(result) {
             source = item.source || "",
             datetime = item.pubDate,
             allList = item.allList;
+        let imgurls = item.imageurls.length && item.imageurls[0].url || "";
+        
         let content = "";
-        allList.forEach(function (item) {
-            let isObject = common.isObject(item);
-            if (isObject) {
-                content += '<p class="image"><img style="width:' + item.width + 'px;height:' + item.height + 'px" src="' + item.url + '"></p>'
-                return;
-            }
-            content += '<p>' + item + '</p>';
-        });
-        dbSchedule.queryAsync("INSERT INTO news (title,description,imageurls,channelId,channelName,content,sourceurl,source,datetime) VALUES ('" + title + "','" + description + "','" + imgurls + "','" + channelId + "','" + channelName + "','" + content + "','" + sourceurl + "','" + source + "','" + datetime + "');").then(function (result) {
-            console.log(title + ":插入数据成功");
-        }).catch(function (err) {
-            console.log(err);
-        });
+        if (allList) {
+            allList.forEach(function (item) {
+                let isObject = common.isObject(item);
+                if (isObject) {
+                    content += '<p class="image"><img style="width:' + item.width + 'px;height:' + item.height + 'px" src="' + item.url + '"></p>'
+                    return;
+                }
+                content += '<p>' + item + '</p>';
+            });
+            dbSchedule.queryAsync("INSERT INTO news (title,description,imageurls,channelId,channelName,content,sourceurl,source,datetime) VALUES ('" + title + "','" + description + "','" + imgurls + "','" + channelId + "','" + channelName + "','" + content + "','" + sourceurl + "','" + source + "','" + datetime + "');").then(function (result) {
+                console.log(title + ":插入数据成功");
+            }).catch(function (err) {
+                console.log(title + ":插入数据失败");
+            });
+        }
+
     });
 }
 
