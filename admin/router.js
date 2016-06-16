@@ -25,7 +25,6 @@ router.get("/getNewsList", function (req, res) {
             item.datetime = formDatetime(item.datetime)
             return item;
         });
-
         res.send({
             code: 0,
             data: data,

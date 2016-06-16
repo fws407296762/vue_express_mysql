@@ -128,26 +128,56 @@ function insertNews(result) {
             source = item.source || "",
             datetime = item.pubDate,
             allList = item.allList;
-        let imgurls = item.imageurls.length && item.imageurls[0].url || "";
-        
-        let content = "";
-        if (allList) {
-            allList.forEach(function (item) {
-                let isObject = common.isObject(item);
-                if (isObject) {
-                    content += '<p class="image"><img style="width:' + item.width + 'px;height:' + item.height + 'px" src="' + item.url + '"></p>'
-                    return;
+        let imgurls = item.imageurls;
+        downImgs(imgurls).then(function (imgurls) {
+            let content = "";
+            if (allList) {
+                allList.forEach(function (item) {
+                    let isObject = common.isObject(item);
+                    if (isObject) {
+                        content += '<p class="image"><img style="width:' + item.width + 'px;height:' + item.height + 'px" src="' + imgurls[item.url] + '"></p>'
+                        return;
+                    }
+                    content += '<p>' + item + '</p>';
+                });
+                let _imgurls = [];
+                for(let i in imgurls){
+                    _imgurls.push(imgurls[i]);
                 }
-                content += '<p>' + item + '</p>';
-            });
-            dbSchedule.queryAsync("INSERT INTO news (title,description,imageurls,channelId,channelName,content,sourceurl,source,datetime) VALUES ('" + title + "','" + description + "','" + imgurls + "','" + channelId + "','" + channelName + "','" + content + "','" + sourceurl + "','" + source + "','" + datetime + "');").then(function (result) {
-                console.log(title + ":插入数据成功");
-            }).catch(function (err) {
-                console.log(title + ":插入数据失败");
-            });
-        }
+                _imgurls = _imgurls.join(",");
+
+                dbSchedule.queryAsync("INSERT INTO news (title,description,imageurls,channelId,channelName,content,sourceurl,source,datetime) VALUES ('" + title + "','" + description + "','" + _imgurls + "','" + channelId + "','" + channelName + "','" + content + "','" + sourceurl + "','" + source + "','" + datetime + "');").then(function (result) {
+                    console.log(title + ":插入数据成功");
+                }).catch(function (err) {
+                    console.log(title + ":插入数据失败"); 
+                });
+            }
+        })
 
     });
 }
+
+function downImgs(imgurls) {
+    return new Promise(function (resolve, reject) {
+        if (imgurls.length) {
+            let imgurlsObj = {};
+            let maxDownSize = imgurls.length, downSize = 1;
+            imgurls.forEach(function (item) {
+                let url = item.url;
+                common.download(url).then(function (data) {
+                    imgurlsObj[url] = data;
+                    if (downSize === maxDownSize) {
+                        resolve(imgurlsObj);
+                        return false;
+                    }
+                    downSize++;
+                }).catch(function(){
+                    console.log('下载失败')
+                })
+            });
+        }
+    })
+}
+
 
 module.exports = dbSchedule;
