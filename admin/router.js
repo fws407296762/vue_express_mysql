@@ -9,6 +9,10 @@ router.get("/", function (req, res) {
     res.render("index")
 });
 
+router.get("/demo", function (req, res) {
+    res.render("demo")
+});
+
 router.get("/async/*", function (req, res) {
     res.render(req.url.substring(1));
 });

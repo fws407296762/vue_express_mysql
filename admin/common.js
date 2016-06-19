@@ -30,6 +30,8 @@ common.getTimesTamp = function () {
 
 common.download = function (src) {
     let self = this;
+    let patt = /\?\S*$/;
+    src = src.replace(patt,"");
     return new Promise(function (resolve, reject) {
         let dir = 'upload';
         let date = new Date();
@@ -40,17 +42,26 @@ common.download = function (src) {
         dir = dir + "/" + year + "/" + month + "/" + day;
         let filename = '' + year + month + day + getTime;
         let lastFileDir = src.substring(src.lastIndexOf("/"));
-        let ext = lastFileDir.lastIndexOf(".") > -1 ? lastFileDir.substring(lastFileDir.lastIndexOf(".")) : '.jpg' ;
+        let extIndex = lastFileDir.lastIndexOf(".");
+        let ext = extIndex > -1 ? lastFileDir.substring(extIndex) : ".jpg";
         self.mkdirsSync(dir);
         let filePath = '/' + dir + '/' + filename + ext;
         let writestream = fs.createWriteStream("."+filePath);
+        console.log("正在下载："+src);
         http.get(src, function (res) {
             res.pipe(writestream);
+            res.on("error",function(err){
+                console.log(err);
+            })
         });
         writestream.on('finish', function () {
-            // console.log(src + "  下载完成");
+            console.log(src + "  下载完成");
             resolve(filePath);
         });
+        writestream.on("error",function(err){
+            console.log(err);
+            reject(err);
+        })
     });
 };
 
@@ -77,5 +88,6 @@ common.mkdirsSync = function (dir, mode) {
     }
     return true;
 }
+
 module.exports = common;
 

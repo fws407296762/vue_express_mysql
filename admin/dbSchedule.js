@@ -2,6 +2,7 @@ const express = require("express");
 const http = require("http");
 const querystring = require("querystring");
 const schedule = require("node-schedule");
+const CronJob = require('cron').CronJob;
 const common = require("./common");
 const mysqlConnection = require("./mysqlConnection");
 const connection = mysqlConnection.connection;
@@ -23,6 +24,14 @@ let apiConfig = {
 };
 
 let dbSchedule = {
+    jobs: null,
+    rule: function () {
+        var times = [];
+        for (var i = 1; i < 60; i += 10) {
+            times.push(i);
+        }
+        return times;
+    },
     requestAsync: (options) => {
         return new Promise((resolve, reject) => {
             let request = http.request(options, (res) => {
@@ -54,13 +63,9 @@ let dbSchedule = {
         return this.requestAsync(requestOptions)
     },
     setScheduleCron: function (callback) {
-        let rule = new schedule.RecurrenceRule();
-        var times = [];
-        for (var i = 0; i < 60; i += 10) {
-            times.push(i);
-        }
-        rule.second = times;
-        let j = schedule.scheduleJob(rule, callback);
+        var rule = new schedule.RecurrenceRule();
+        rule.second = this.rule;
+        this.jobs = schedule.scheduleJob({ second: this.times }, callback);
     },
     queryAsync: function (query) {
         return new Promise(function (resolve, reject) {
@@ -90,7 +95,6 @@ let o = {
 
 dbSchedule.setScheduleCron(function () {
     let date = new Date();
-    console.log(date.toString());
     dbSchedule.getNews({
         params: {
             page: 1
@@ -129,30 +133,42 @@ function insertNews(result) {
             datetime = item.pubDate,
             allList = item.allList;
         let imgurls = item.imageurls;
-        downImgs(imgurls).then(function (imgurls) {
-            let content = "";
-            if (allList) {
-                allList.forEach(function (item) {
-                    let isObject = common.isObject(item);
-                    if (isObject) {
-                        content += '<p class="image"><img style="width:' + item.width + 'px;height:' + item.height + 'px" src="' + imgurls[item.url] + '"></p>'
-                        return;
-                    }
-                    content += '<p>' + item + '</p>';
-                });
-                let _imgurls = [];
-                for(let i in imgurls){
-                    _imgurls.push(imgurls[i]);
-                }
-                _imgurls = _imgurls.join(",");
-
-                dbSchedule.queryAsync("INSERT INTO news (title,description,imageurls,channelId,channelName,content,sourceurl,source,datetime) VALUES ('" + title + "','" + description + "','" + _imgurls + "','" + channelId + "','" + channelName + "','" + content + "','" + sourceurl + "','" + source + "','" + datetime + "');").then(function (result) {
-                    console.log(title + ":插入数据成功");
-                }).catch(function (err) {
-                    console.log(title + ":插入数据失败"); 
-                });
-            }
-        })
+        hasRecord("news", "title", title).then(function () {
+            dbSchedule.jobs.cancel();
+            downImgs(imgurls).then(function () {
+                dbSchedule.jobs.reschedule(dbSchedule.rule);
+            });
+            // downImgs(imgurls).then(function (imgurls) {
+            //     console.log(imgurls)
+            //     let content = "";
+            //     if (allList) {
+            //         allList.forEach(function (item) {
+            //             let isObject = common.isObject(item);
+            //             if (isObject) {
+            //                 content += '<p class="image"><img style="width:' + item.width + 'px;height:' + item.height + 'px" src="' + imgurls[item.url] + '"></p>'
+            //                 return;
+            //             }
+            //             content += '<p>' + item + '</p>';
+            //         });
+            //         let _imgurls = [];
+            //         if (imgurls) {
+            //             for (let i in imgurls) {
+            //                 _imgurls.push(imgurls[i]);
+            //             }
+            //         }
+            //         _imgurls = _imgurls.join(",");
+            //         dbSchedule.queryAsync("INSERT INTO news (title,description,imageurls,channelId,channelName,content,sourceurl,source,datetime) VALUES ('" + title + "','" + description + "','" + _imgurls + "','" + channelId + "','" + channelName + "','" + content + "','" + sourceurl + "','" + source + "','" + datetime + "');").then(function (result) {
+            //             // console.log(date.toString() + "=====" + title + ":插入数据成功");
+            //         }).catch(function (err) {
+            //             // console.log(date.toString() + "=====" + title + ":插入数据失败");
+            //         }).then(function () {
+            //             dbSchedule.jobs.reschedule(dbSchedule.rule);
+            //         });
+            //     }
+            // });
+        }).catch(function (err) {
+            // console.log(date.toString() + "=====" + "错误消息：" + err)
+        });
 
     });
 }
@@ -162,22 +178,39 @@ function downImgs(imgurls) {
         if (imgurls.length) {
             let imgurlsObj = {};
             let maxDownSize = imgurls.length, downSize = 1;
-            imgurls.forEach(function (item) {
-                let url = item.url;
-                common.download(url).then(function (data) {
-                    imgurlsObj[url] = data;
-                    if (downSize === maxDownSize) {
-                        resolve(imgurlsObj);
-                        return false;
-                    }
-                    downSize++;
-                }).catch(function(){
-                    console.log('下载失败')
-                })
+            let _imgurls = imgurls.map(function (item) {
+                return item.url;
             });
+            common.download(_imgurls).then(function (data) {
+                imgurlsObj[url] = data;
+                if (downSize === maxDownSize) {
+                    resolve(imgurlsObj);
+                    return false;
+                }
+                downSize++;
+            }).catch(function (err) {
+                console.log('下载失败')
+                reject(err)
+            })
+        } else {
+            resolve();
         }
     })
 }
 
-
+function hasRecord(table, record, data) {
+    return new Promise(function (resovle, reject) {
+        let query = "SELECT 1 FROM " + table + " WHERE " + record + "='" + data + "' LIMIT 1 ";
+        dbSchedule.queryAsync(query).then(function (result) {
+            let resultLen = result.length;
+            if (!resultLen) {
+                resovle("数据不存在");
+                return false;
+            }
+            reject(data + "=====存在");
+        }).catch(function (err) {
+            reject(err);
+        })
+    })
+}
 module.exports = dbSchedule;
