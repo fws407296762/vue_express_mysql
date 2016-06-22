@@ -27,7 +27,7 @@ let dbSchedule = {
     jobs: null,
     rule: function () {
         var times = [];
-        for (var i = 1; i < 60; i += 10) {
+        for (var i = 0; i < 60; i += 10) {
             times.push(i);
         }
         return times;
@@ -64,8 +64,8 @@ let dbSchedule = {
     },
     setScheduleCron: function (callback) {
         var rule = new schedule.RecurrenceRule();
-        rule.second = this.rule;
-        this.jobs = schedule.scheduleJob({ second: this.times }, callback);
+        rule.second = this.rule();
+        this.jobs = schedule.scheduleJob({ second: rule.second }, callback);
     },
     queryAsync: function (query) {
         return new Promise(function (resolve, reject) {
@@ -95,6 +95,7 @@ let o = {
 
 dbSchedule.setScheduleCron(function () {
     let date = new Date();
+    console.log(date.toString());
     dbSchedule.getNews({
         params: {
             page: 1
@@ -122,7 +123,16 @@ function insertNews(result) {
         allNum = pagebean.allNum,   //总条数
         maxResult = pagebean.maxResult //每页最大的条数
     contentlist = pagebean.contentlist;  //所有的数据    
-    contentlist.forEach(function (item, index) {
+
+    let step = 0,
+        contentlistlen = contentlist.length,
+        timer = null;
+    (function (item) {
+        if (step === contentlistlen) {
+            dbSchedule.jobs.reschedule({ second: dbSchedule.rule() });
+            return false;
+        }
+        dbSchedule.jobs.cancel();
         let title = item.title,
             description = item.desc || "",
             channelId = item.channelId,
@@ -133,65 +143,86 @@ function insertNews(result) {
             datetime = item.pubDate,
             allList = item.allList;
         let imgurls = item.imageurls;
-        hasRecord("news", "title", title).then(function () {
-            dbSchedule.jobs.cancel();
-            downImgs(imgurls).then(function () {
-                dbSchedule.jobs.reschedule(dbSchedule.rule);
-            });
-            // downImgs(imgurls).then(function (imgurls) {
-            //     console.log(imgurls)
-            //     let content = "";
-            //     if (allList) {
-            //         allList.forEach(function (item) {
-            //             let isObject = common.isObject(item);
-            //             if (isObject) {
-            //                 content += '<p class="image"><img style="width:' + item.width + 'px;height:' + item.height + 'px" src="' + imgurls[item.url] + '"></p>'
-            //                 return;
-            //             }
-            //             content += '<p>' + item + '</p>';
-            //         });
-            //         let _imgurls = [];
-            //         if (imgurls) {
-            //             for (let i in imgurls) {
-            //                 _imgurls.push(imgurls[i]);
-            //             }
-            //         }
-            //         _imgurls = _imgurls.join(",");
-            //         dbSchedule.queryAsync("INSERT INTO news (title,description,imageurls,channelId,channelName,content,sourceurl,source,datetime) VALUES ('" + title + "','" + description + "','" + _imgurls + "','" + channelId + "','" + channelName + "','" + content + "','" + sourceurl + "','" + source + "','" + datetime + "');").then(function (result) {
-            //             // console.log(date.toString() + "=====" + title + ":插入数据成功");
-            //         }).catch(function (err) {
-            //             // console.log(date.toString() + "=====" + title + ":插入数据失败");
-            //         }).then(function () {
-            //             dbSchedule.jobs.reschedule(dbSchedule.rule);
-            //         });
-            //     }
-            // });
-        }).catch(function (err) {
-            // console.log(date.toString() + "=====" + "错误消息：" + err)
+        let that = arguments.callee;
+        console.log(step);
+        downImgs(imgurls).then(function (data) {
+            console.log(data);
+            step++;
+            that(contentlist[step]);
+        }).catch(function(err){
+            console.log(err);
         });
+    })(contentlist[step]);
 
-    });
+
+    // contentlist.forEach(function (item, index) {
+
+
+    //     hasRecord("news", "title", title).then(function () {
+    //         dbSchedule.jobs.cancel();
+    //         downImgs(imgurls).then(function () {
+
+    //         });
+    //         // downImgs(imgurls).then(function (imgurls) {
+    //         //     console.log(imgurls)
+    //         //     let content = "";
+    //         //     if (allList) {
+    //         //         allList.forEach(function (item) {
+    //         //             let isObject = common.isObject(item);
+    //         //             if (isObject) {
+    //         //                 content += '<p class="image"><img style="width:' + item.width + 'px;height:' + item.height + 'px" src="' + imgurls[item.url] + '"></p>'
+    //         //                 return;
+    //         //             }
+    //         //             content += '<p>' + item + '</p>';
+    //         //         });
+    //         //         let _imgurls = [];
+    //         //         if (imgurls) {
+    //         //             for (let i in imgurls) {
+    //         //                 _imgurls.push(imgurls[i]);
+    //         //             }
+    //         //         }
+    //         //         _imgurls = _imgurls.join(",");
+    //         //         dbSchedule.queryAsync("INSERT INTO news (title,description,imageurls,channelId,channelName,content,sourceurl,source,datetime) VALUES ('" + title + "','" + description + "','" + _imgurls + "','" + channelId + "','" + channelName + "','" + content + "','" + sourceurl + "','" + source + "','" + datetime + "');").then(function (result) {
+    //         //             // console.log(date.toString() + "=====" + title + ":插入数据成功");
+    //         //         }).catch(function (err) {
+    //         //             // console.log(date.toString() + "=====" + title + ":插入数据失败");
+    //         //         }).then(function () {
+    //         //             dbSchedule.jobs.reschedule(dbSchedule.rule);
+    //         //         });
+    //         //     }
+    //         // });
+    //     }).catch(function (err) {
+    //         // console.log(date.toString() + "=====" + "错误消息：" + err)
+    //     });
+
+    // });
 }
 
 function downImgs(imgurls) {
     return new Promise(function (resolve, reject) {
         if (imgurls.length) {
-            let imgurlsObj = {};
-            let maxDownSize = imgurls.length, downSize = 1;
             let _imgurls = imgurls.map(function (item) {
                 return item.url;
             });
-            common.download(_imgurls).then(function (data) {
-                imgurlsObj[url] = data;
-                if (downSize === maxDownSize) {
-                    resolve(imgurlsObj);
+            let imglen = _imgurls.length;
+            let step = 0;
+            let resolveImg = {};
+            (function (url) {
+                if (step === imglen) {
+                    resolve(resolveImg);
                     return false;
                 }
-                downSize++;
-            }).catch(function (err) {
-                console.log('下载失败')
-                reject(err)
-            })
+                let that = arguments.callee;
+                common.download(url).then(function (data) {
+                    console.log(data);
+                    step++;
+                    resolveImg[url] = data;
+                    that(_imgurls[step]);
+                }).catch(function (err) {
+                    console.log('下载失败')
+                    reject(err)
+                })
+            })(_imgurls[step])
         } else {
             resolve();
         }

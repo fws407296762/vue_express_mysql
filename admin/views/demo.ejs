@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title>
+</head>
+<body>
+    <script>
+        var arr = ['https://www.baidu.com/','http://www.cnblogs.com/georgewing/archive/2010/05/18/1738037.html','http://www.cnblogs.com/vnii/archive/2011/12/23/2299636.html','http://www.cnblogs.com/guohu/p/3657484.html','http://www.qq.com/','http://weibo.com/','http://fd.zaih.com/question/90000033010916688277?from=singlemessage&isappinstalled=0&smtid=466519981z1kt6zr3v6z12wz0z','http://www.zhihu.com/','https://www.taobao.com/'];
+        var step = 0;
+        var arrlen = arr.length - 1;
+        var timer = null;
+        function a(data){
+            if(step > arrlen){
+                clearInterval(timer);
+                return 1;
+            }
+            timer = setInterval(function(){
+                clearInterval(timer);
+                console.log(arr[step]);
+                step++;
+                a(arr[step]);
+            },3000)
+        }
+        a(arr[step])
+    </script>
+</body>
+</html>
