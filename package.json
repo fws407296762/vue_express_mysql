@@ -12,6 +12,7 @@
     "mongodb": "^2.1.21",
     "mysql": "^2.10.2",
     "node-cron": "^1.1.1",
+    "node-sass": "^3.8.0",
     "node-schedule": "^1.1.0",
     "url-loader": "^0.5.7",
     "vue": "^1.0.24",
