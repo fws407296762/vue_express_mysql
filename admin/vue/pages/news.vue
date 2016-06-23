@@ -18,7 +18,7 @@
                     <tr v-if="news.length" v-for="n in news">
                         <td><a v-link="{path:'/news/page',query:{id:n.id}}" v-text="n.title"></a></td>
                         <td class="tac cgray" v-text="n.channelName"></td>
-                        <td class="tac"><a :href="n.link" target="_blank" v-text="n.source"></a></td>
+                        <td class="tac"><a :href="n.sourceurl" target="_blank" v-text="n.source"></a></td>
                         <td class="tac cgray" v-text="n.datetime"></td>
                         <td class="tac action-box">
                             <button class="iconfont icon-edit"></button>
@@ -58,7 +58,7 @@
                 url:"/admin/getNewsList",
                 data:{
                     page:1,
-                    pageno:10
+                    pageno:20
                 },
                 beforeSend:function(request){
                     self.loading = "正在加载数据..."
