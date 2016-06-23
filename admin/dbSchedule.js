@@ -88,8 +88,9 @@ let dbSchedule = {
     }
 }
 
-let o = {
-    allPages: 1
+let news = {
+    allPages: 1,
+    firstRequest: true
 };
 
 dbSchedule.setScheduleCron(function () {
@@ -97,18 +98,31 @@ dbSchedule.setScheduleCron(function () {
     console.log(date.toString());
     dbSchedule.getNews({
         params: {
-            page: 1
+            page: news.allPages
         }
     }).then(function (result) {
+        result = JSON.parse(result);
+        let body = result.showapi_res_body,    //返回主体
+            pagebean = body.pagebean,
+            currentPage = pagebean.currentPage,  //当前页数
+            allPages = parseInt(pagebean.allPages);  //总页数
+        console.log(currentPage)
+        if (news.firstRequest) {
+            console.log(result)
+            news.allPages = allPages;
+            return false;
+        }
         return insertNews(result);
     }).catch(function (err) {
         console.log(err);
+    }).then(function(){
+        news.firstRequest = false;
+        news.allPages--;
     });
 });
 
 function insertNews(result) {
     let date = new Date();
-    result = JSON.parse(result);
     let code = parseInt(result.showapi_res_code);  //返回状态 0：成功
     let error = result.showapi_res_error;  //如果返回错误，这个不为空
     if (code < 0) {
@@ -129,7 +143,7 @@ function insertNews(result) {
     (function (item) {
         if (step === contentlistlen) {
             dbSchedule.jobs.reschedule({ second: dbSchedule.rule() });
-            return false;
+            return Promise.resolve();
         }
         dbSchedule.jobs.cancel();
         let title = item.title,
@@ -143,7 +157,7 @@ function insertNews(result) {
             allList = item.allList;
         let imgurls = item.imageurls;
         let that = arguments.callee;
-        hasRecord("news", "title", title).then(function(){
+        hasRecord("news", "title", title).then(function () {
             downImgs(imgurls).then(function (imgurls) {
                 let content = "";
                 if (allList) {
@@ -166,19 +180,19 @@ function insertNews(result) {
                         console.log(date.toString() + "=====" + title + ":插入数据成功");
                     }).catch(function (err) {
                         console.log(date.toString() + "=====" + title + ":插入数据失败");
-                    }).then(function(){
+                    }).then(function () {
                         console.log(_imgurls)
                         step++;
                         that(contentlist[step]);
                     });
-                }else{
+                } else {
                     step++;
                     that(contentlist[step]);
                 }
-            }).catch(function(err){
+            }).catch(function (err) {
                 console.log(err);
             });
-        }).catch(function(){
+        }).catch(function () {
             console.log(date.toString() + "=====" + title + ":数据已存在");
             step++;
             that(contentlist[step]);
