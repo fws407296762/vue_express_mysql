@@ -108,16 +108,15 @@ dbSchedule.setScheduleCron(function () {
             allPages = parseInt(pagebean.allPages);  //总页数
         console.log(currentPage)
         if (news.firstRequest) {
-            console.log(result)
             news.allPages = allPages;
+            news.firstRequest = false;
             return false;
+        }else{
+            news.allPages--;
         }
         return insertNews(result);
     }).catch(function (err) {
         console.log(err);
-    }).then(function(){
-        news.firstRequest = false;
-        news.allPages--;
     });
 });
 
@@ -177,11 +176,10 @@ function insertNews(result) {
                     }
                     _imgurls = _imgurls.join(",");
                     dbSchedule.queryAsync("INSERT INTO news (title,description,imageurls,channelId,channelName,content,sourceurl,source,datetime) VALUES ('" + title + "','" + description + "','" + _imgurls + "','" + channelId + "','" + channelName + "','" + content + "','" + sourceurl + "','" + source + "','" + datetime + "');").then(function (result) {
-                        console.log(date.toString() + "=====" + title + ":插入数据成功");
+                        // console.log(date.toString() + "=====" + title + ":插入数据成功");
                     }).catch(function (err) {
-                        console.log(date.toString() + "=====" + title + ":插入数据失败");
+                        // console.log(date.toString() + "=====" + title + ":插入数据失败");
                     }).then(function () {
-                        console.log(_imgurls)
                         step++;
                         that(contentlist[step]);
                     });
@@ -193,7 +191,7 @@ function insertNews(result) {
                 console.log(err);
             });
         }).catch(function () {
-            console.log(date.toString() + "=====" + title + ":数据已存在");
+            // console.log(date.toString() + "=====" + title + ":数据已存在");
             step++;
             that(contentlist[step]);
         });
@@ -216,7 +214,6 @@ function downImgs(imgurls) {
                 }
                 let that = arguments.callee;
                 common.download(url).then(function (data) {
-                    console.log(data);
                     step++;
                     resolveImg[url] = data;
                     that(_imgurls[step]);
