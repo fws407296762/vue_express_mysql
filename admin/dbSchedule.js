@@ -189,6 +189,8 @@ function insertNews(result) {
                 }
             }).catch(function (err) {
                 console.log(err);
+                step++;
+                that(contentlist[step]);
             });
         }).catch(function () {
             // console.log(date.toString() + "=====" + title + ":数据已存在");

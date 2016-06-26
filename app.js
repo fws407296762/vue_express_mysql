@@ -9,4 +9,4 @@ app.use('/ap',express.static('admin/public'));
 app.use('/upload',express.static('admin/upload'));
 app.use("/admin",adminRouter);
 
-app.listen(80);
+app.listen(8082);
