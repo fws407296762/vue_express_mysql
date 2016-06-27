@@ -89,13 +89,13 @@ let dbSchedule = {
 }
 
 let news = {
-    allPages: 1,
-    firstRequest: true
+    allPages: 2,
+    firstRequest: false
 };
 
 dbSchedule.setScheduleCron(function () {
     let date = new Date();
-    console.log(date.toString());
+    console.log('\n'+date.toString());
     dbSchedule.getNews({
         params: {
             page: news.allPages
@@ -106,14 +106,15 @@ dbSchedule.setScheduleCron(function () {
             pagebean = body.pagebean,
             currentPage = pagebean.currentPage,  //当前页数
             allPages = parseInt(pagebean.allPages);  //总页数
-        console.log(currentPage)
+        console.log(currentPage);
         if (news.firstRequest) {
             news.allPages = allPages;
             news.firstRequest = false;
             return false;
         }else{
-            news.allPages--;
+            news.allPages = news.allPages > 1 ? news.allPages-1 : 1;
         }
+        console.log(news.allPages);
         return insertNews(result);
     }).catch(function (err) {
         console.log(err);
