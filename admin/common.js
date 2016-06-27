@@ -63,9 +63,21 @@ common.download = function (src) {
         self.mkdirsSync(dir);
         let filePath = '/' + dir + '/' + filename + ext;
         let writestream = fs.createWriteStream("." + filePath);
-        console.log("正在下载：" + src);
+        console.log("\n"+src);
         let getRequest = agreementObj[agreement].get(src, function (res) {
-            res.pipe(writestream);
+            let contentLength = res.headers["content-length"];
+            let c = new Buffer(0);
+            res.on("data",function(chunk){
+                c = Buffer.concat([c,chunk]);
+                if(contentLength){
+                    self.progress(c,contentLength);
+                }
+            });
+            res.on("end", function () {
+                writestream.write(c);
+                writestream.end();
+                resolve(filePath);
+            });
         });
         getRequest.on("error",function(err){
             let msg = self.getErrormsg(err);
@@ -76,14 +88,6 @@ common.download = function (src) {
             }
             reject(msg);
         });
-        writestream.on('finish', function () {
-            console.log(src + "  下载完成");
-            resolve(filePath);
-        });
-        writestream.on("error", function (err) {
-            console.log(err);
-            reject(err);
-        })
     });
 };
 
@@ -109,6 +113,22 @@ common.mkdirsSync = function (dir, mode) {
         })
     }
     return true;
+}
+common.progress = function (c,total) {
+    // console.log(c,total)
+    let width = 20;
+    let complete = "\033[42m \033[0m";
+    let incomplete = "\033[41m \033[0m";
+    let clen = c.length;
+    let ratio = clen / total
+    let percen = ratio * 100;
+    let completeLen = Math.round(width * ratio);
+    let completes = Array(completeLen + 1).join(complete);
+    let incompletes = Array(width - completeLen + 1).join(incomplete);
+    let str = completes + incompletes;
+    process.stderr.cursorTo(0);
+    process.stderr.write(str + " 已经下载：" + percen.toFixed(1) + "%；已经下载文件大小：" + (clen / 1024 / 1024).toFixed(2) + "MB");
+    process.stderr.clearLine(1);
 }
 
 module.exports = common;
