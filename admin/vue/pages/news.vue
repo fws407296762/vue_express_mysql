@@ -34,7 +34,9 @@
                 </tbody>
             </table>
         </div>
+        <v-pagination :combination="{all:paginationNum,cur:1,cb:pagination}"></v-pagination>
     </div>
+    
 </template>
 
 <style>
@@ -50,12 +52,17 @@
 </style>
 
 <script>
+    import vPagination from "../component/vuePagination.vue"
     export default {
+        components:{
+            vPagination:vPagination
+        },
         data (){
             return {
                 news:[],
                 channel:[{"channelId":"0","channelName":"全部"}],
-                loading:""
+                loading:"",
+                paginationNum:0
             }
         },
         methods :{
@@ -63,6 +70,11 @@
                 channelid = channelid === "0" ? "" : channelid;
                 this.showNewsList({
                     channelid:channelid
+                })
+            },
+            pagination:function(page){
+                this.showNewsList({
+                    page:page
                 })
             },
             showNewsList:function(options){
@@ -88,6 +100,11 @@
                     let code = parseInt(data.code),
                         msg = data.msg;
                     let news = data.data;
+                    self.paginationNum = parseInt(data.pagination);
+                    let newsLen = news.lenght;
+                    if(!newsLen){
+                        self.loading = "暂无数据";
+                    }
                     self.news = news;
                 }).catch(function(err){
                     console.log(err);
