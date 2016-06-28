@@ -13,16 +13,34 @@ router.get("/demo", function (req, res) {
     res.render("demo")
 });
 
-router.get("/async/*", function (req, res) {
-    res.render(req.url.substring(1));
-});
+router.get("/getChannel",function(req,res){
+    queryPromise("USE " + mysqlOptions.database).then(function(){
+        return queryPromise("SELECT * FROM channel");
+    }).then(function(result){
+        let data = result;
+        res.send({
+            code: 0,
+            data: data,
+            msg: ""
+        })
+        res.end()
+    }).catch(function(){
+        res.send(err);
+        res.end();
+    })
+})
 
 router.get("/getNewsList", function (req, res) {
     let query = req.query;
     let page = parseInt(query.page) - 1 < 0 ? 0 : (parseInt(query.page) - 1),
         pageno = parseInt(query.pageno) || 10;
+    let channelid = query.channelid || "";
+    let where = channelid ? " WHERE" : "";
+    if(channelid){
+        where += " channelid='"+channelid+"'";
+    }
     queryPromise("USE " + mysqlOptions.database).then(function () {
-        return Promise.all([queryPromise("SELECT SQL_CALC_FOUND_ROWS * FROM news ORDER BY datetime DESC LIMIT " + (page * 10) + ", " + (pageno * (page + 1)) + ";"), queryPromise("SELECT FOUND_ROWS();")]);
+        return Promise.all([queryPromise("SELECT SQL_CALC_FOUND_ROWS * FROM news "+where+" ORDER BY datetime DESC LIMIT " + (page * 10) + ", " + (pageno * (page + 1)) + ";"), queryPromise("SELECT FOUND_ROWS();")]);
     }).then(function (result) {
         let total = result[1][0]["FOUND_ROWS()"];
         let data = result[0].map(function (item) {

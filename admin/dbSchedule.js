@@ -93,6 +93,29 @@ let news = {
     firstRequest: true
 };
 
+dbSchedule.getChannel().then(function(result){
+    result = JSON.parse(result);
+    let code = parseInt(result.showapi_res_code),
+        error = result.showapi_res_error;
+    let body = result.showapi_res_body;
+    let totalNum = parseInt(body.totalNum),
+        ret_code = parseInt(body.ret_code),
+        channelList = body.channelList;
+    let querySql = "INSERT INTO channel(channelId,channelName) VALUES "
+    channelList.forEach(function(item,index){
+        if(!index){
+            querySql += "('"+item.channelId+"','"+item.name+"')";
+            return false
+        }
+        querySql += ",('"+item.channelId+"','"+item.name+"')"
+    })
+    return dbSchedule.queryAsync(querySql);
+}).then(function(result){
+    console.log("新闻频道数据插入成功");
+}).catch(function(err){
+    console.log(err);
+})
+
 dbSchedule.setScheduleCron(function () {
     let date = new Date();
     console.log(date.toString());

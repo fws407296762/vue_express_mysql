@@ -4,6 +4,9 @@
             <h1>今日新闻</h1>
         </div>
         <div class="page-body">
+            <div class="news-channel-list">
+                <a v-link="{name:'newsChannel',params:{channelid:c.channelId},activeClass: 'channel-active'}" role="button" @click="channelSelect(c.channelId)" v-text="c.channelName" v-for="c in channel"></a>
+            </div>
             <table class="data-table">
                 <thead>
                     <tr>
@@ -42,6 +45,8 @@
     .channel-name{color: #999;}
     .action-box button{color: #999;cursor: pointer;}
     .action-box button:hover{color: #333;}
+    .news-channel-list a{display: inline-block;border: 1px solid #ddd;padding: 5px 10px;border-radius: 4px;color: #666;margin-right: 10px;margin-bottom: 10px;}
+    .news-channel-list a:hover,.news-channel-list a.channel-active{background: #2db7f5;color: #fff;border: 1px solid #0885bd;}
 </style>
 
 <script>
@@ -49,30 +54,69 @@
         data (){
             return {
                 news:[],
+                channel:[{"channelId":"0","channelName":"全部"}],
                 loading:""
+            }
+        },
+        methods :{
+            channelSelect:function(channelid){
+                channelid = channelid === "0" ? "" : channelid;
+                this.showNewsList({
+                    channelid:channelid
+                })
+            },
+            showNewsList:function(options){
+                let self = this;
+                let data = {
+                        page:1,
+                        pageno:20
+                    };
+                if(options){
+                    for(let i in options){
+                        data[i] = options[i]
+                    }
+                }
+                this.$http({
+                    url:"/admin/getNewsList",
+                    data:data,
+                    beforeSend:function(request){
+                        self.loading = "正在加载数据..."
+                    }
+                }).then(function(getData){
+                    self.loading = "加载完成";
+                    let data = getData.data;
+                    let code = parseInt(data.code),
+                        msg = data.msg;
+                    let news = data.data;
+                    self.news = news;
+                }).catch(function(err){
+                    console.log(err);
+                });
             }
         },
         ready () {
             let self = this;
+            let channelid = this.$route.params.channelid;
+            channelid = channelid === "0" ? "" : channelid;
+            
             this.$http({
-                url:"/admin/getNewsList",
-                data:{
-                    page:1,
-                    pageno:20
-                },
-                beforeSend:function(request){
-                    self.loading = "正在加载数据..."
-                }
+                url:"/admin/getChannel"
             }).then(function(getData){
-                self.loading = "加载完成";
-                let data = getData.data;
-                let code = parseInt(data.code),
-                    msg = data.msg;
-                let news = data.data;
-                self.news = news;
-            }).catch(function(err){
-                console.log(err);
+                getData = getData.data;
+                let code = parseInt(getData.code);
+                let msg = getData.msg;
+                if(code){
+                    return Promise.reject(msg);
+                }
+                getData.data.forEach(function(item){
+                    self.channel.push(item);
+                })
+            });
+            this.showNewsList({
+                channelid:channelid
             });
         }
     }
+
+ 
 </script>
