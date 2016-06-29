@@ -73,9 +73,22 @@
                 var initDatepicker = this.initDatepicker;
                 var days = initDatepicker.days,   //获取总天数
                     week = this.getFirstDayWeek;  //获取1日是星期几
+                var daysAry = [];
                 //构建日期数组
                 var weeks = Math.ceil(days/7);  //获取有多少个星期
-                
+                var _days = days;
+                var date = 1;
+                for(var i = 0;i<weeks;i++){
+                    daysAry[i] = [];
+                    for(var j = 0;j<7;j++){
+                        if(j < week && date === 1 || date > days){
+                            daysAry[i][j] = 0;
+                            continue;
+                        }
+                        daysAry[i][j] = date++;
+                    }
+                }
+                return daysAry;
             },
             renderDatepicker:function(){
 
@@ -84,6 +97,7 @@
         ready:function(){
             var initDatepicker = this.initDatepicker;
             this.day = initDatepicker.days;
+            console.log(this.renderData);
         }
     }
 </script>

@@ -3,22 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <title>首页</title>
-    <script type="text/javascript">
-        try {
-            document.execCommand('BackgroundImageCache', false, true);
-        }
-        catch(e) {};
-    </script> 
-    <style>
-        span{
-            display:inline-block;
-            background:url("https://ss1.bdstatic.com/5eN1bjq8AAUYm2zgoY3K/r/www/cache/static/protocol/https/soutu/img/camera_new_679c15cc.png") no-repeat 0 0;
-            width:50px;
-            height:50px;
-        }
-    </style>
 </head>
 <body>
-    <span></span>
+    <script>
+        var d = 30;
+        var startIndex = 3;
+        var weeks = Math.ceil(30/7);
+        var count = weeks * 7;
+        var redundant = count - d;
+        var lastCount = redundant - startIndex;
+        var numList = "";
+        var i = 1;
+        while(i <= d){
+            numList += i++;
+        }
+        var startStr = Array(startIndex+1).join(0);
+        var endStr = Array(lastCount+1).join(0);
+        console.log(startStr+numList+endStr);
+    </script>
 </body>
 </html>
