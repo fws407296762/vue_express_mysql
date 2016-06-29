@@ -23,6 +23,7 @@
     .pagination li{display: inline-block;}
     .pagination li a{display: inline-block;padding: 5px 10px;border: 1px solid #ddd;margin-left: 5px;margin-right: 5px;cursor: pointer;}
     .pagination li.disabled a{cursor: not-allowed;}
+    .pagination i{font-style: normal;}
     .pagination li.active a{background: #2db7f5;border: 1px solid #0885bd;color: #fff;}
 </style>
 <script>

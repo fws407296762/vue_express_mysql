@@ -24,8 +24,8 @@
                         <td class="tac"><a :href="n.sourceurl" target="_blank" v-text="n.source"></a></td>
                         <td class="tac cgray" v-text="n.datetime"></td>
                         <td class="tac action-box">
-                            <button class="iconfont icon-edit"></button>
-                            <button class="iconfont icon-delete"></button>
+                            <a v-link="{name:'newsEdit',params:{id:n.id}}" class="iconfont icon-edit"></a>
+                            <a class="iconfont icon-delete"></a>
                         </td>
                     </tr>
                     <tr v-if="!news.length">
@@ -36,7 +36,6 @@
         </div>
         <v-pagination :combination="{all:paginationNum,cur:1,cb:pagination}"></v-pagination>
     </div>
-    
 </template>
 
 <style>
@@ -45,8 +44,8 @@
     .data-table th{background: #f3f3f3;}
     .data-table a{color: #0885bd;}
     .channel-name{color: #999;}
-    .action-box button{color: #999;cursor: pointer;}
-    .action-box button:hover{color: #333;}
+    .action-box a{color: #999;cursor: pointer;}
+    .action-box a:hover{color: #333;}
     .news-channel-list a{display: inline-block;border: 1px solid #ddd;padding: 5px 10px;border-radius: 4px;color: #666;margin-right: 10px;margin-bottom: 10px;}
     .news-channel-list a:hover,.news-channel-list a.channel-active{background: #2db7f5;color: #fff;border: 1px solid #0885bd;}
 </style>
@@ -62,19 +61,21 @@
                 news:[],
                 channel:[{"channelId":"0","channelName":"全部"}],
                 loading:"",
-                paginationNum:0
+                paginationNum:0,
+                channelid:""
             }
         },
         methods :{
             channelSelect:function(channelid){
-                channelid = channelid === "0" ? "" : channelid;
+                this.channelid = channelid === "0" ? "" : channelid;
                 this.showNewsList({
-                    channelid:channelid
+                    channelid:this.channelid
                 })
             },
             pagination:function(page){
                 this.showNewsList({
-                    page:page
+                    page:page,
+                    channelid:this.channelid
                 })
             },
             showNewsList:function(options){
@@ -114,7 +115,7 @@
         ready () {
             let self = this;
             let channelid = this.$route.params.channelid;
-            channelid = channelid === "0" ? "" : channelid;
+            this.channelid = channelid === "0" ? "" : channelid;
             
             this.$http({
                 url:"/admin/getChannel"
@@ -130,7 +131,7 @@
                 })
             });
             this.showNewsList({
-                channelid:channelid
+                channelid:this.channelid
             });
         }
     }

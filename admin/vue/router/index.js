@@ -16,6 +16,10 @@ export function configRouter(router) {
                 "/news/page":{
                     name:"newsContent",
                     component:require("../pages/newsConetnt.vue")
+                },
+                "/news/edit/:id":{
+                    name:"newsEdit",
+                    component:require("../pages/newsEdit.vue")
                 }
             }
         }

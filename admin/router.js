@@ -39,8 +39,9 @@ router.get("/getNewsList", function (req, res) {
     if(channelid){
         where += " channelid='"+channelid+"'";
     }
+    console.log((page * pageno),(pageno * (page + 1)))
     queryPromise("USE " + mysqlOptions.database).then(function () {
-        return Promise.all([queryPromise("SELECT SQL_CALC_FOUND_ROWS * FROM news "+where+" ORDER BY datetime DESC LIMIT " + (page * pageno) + ", " + (pageno * (page + 1)) + ";"), queryPromise("SELECT FOUND_ROWS();")]);
+        return Promise.all([queryPromise("SELECT SQL_CALC_FOUND_ROWS * FROM news "+where+" ORDER BY datetime DESC LIMIT " + (page * pageno) + ", " + pageno + ";"), queryPromise("SELECT FOUND_ROWS();")]);
     }).then(function (result) {
         let total = result[1][0]["FOUND_ROWS()"];
         let data = result[0].map(function (item) {
