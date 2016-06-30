@@ -25,7 +25,16 @@
             <dl class="edit-item">
                 <dt>更新日期：</dt>
                 <dd>
-                    <v-datepicker></v-datepicker>
+                    <input type="text" v-model="datetime" name="" id="" class="form-control">
+                    <!--<v-datepicker></v-datepicker>-->
+                </dd>
+            </dl>
+            <dl class="edit-item">
+                <dt>图片：</dt>
+                <dd>
+                    <div v-for="imgurl in imageurls" class="imageurl-input-box">
+                        <input type="text" v-model="imgurl" name="" id="" class="form-control">
+                    </div>
                 </dd>
             </dl>
         </div>
@@ -48,6 +57,7 @@
     select.form-control{width: 500px;height: 40px;border: 1px solid #ddd;font-family: "Microsoft YaHei","\5FAE\8F6F\96C5\9ED1";font-size: 14px;}
     .source-item input[type="text"].form-control:first-of-type{width: 100px;text-align: center;}
     .source-item input[type="text"].form-control:last-of-type{width: 396px;}
+    .imageurl-input-box{margin-bottom: 10px;}
 </style>
 <script>
     import vDatepicker from "../component/vueDatepicker.vue"
@@ -63,7 +73,8 @@
                 channelName:"",
                 source:"",
                 sourceurl:"",
-                datetime:""
+                datetime:"",
+                imageurls:[]
             }
         },
         ready:function(){
@@ -99,6 +110,7 @@
                 self.source = result.source;
                 self.sourceurl = result.sourceurl;
                 self.datetime = result.datetime;
+                self.imageurls = result.imageurls.split(",");
             }).catch(function(err){
                 console.log(err);
             })
