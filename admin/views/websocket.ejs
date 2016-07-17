@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Websocket</title>
+</head>
+<body>
+
+<input type="text" id="input" name="" id="">
+    <script>
+        window.onload = function(){
+            var $input = document.getElementById("input");
+            let socket = new WebSocket('ws://localhost:8082/admin');
+            socket.onopen = function(){
+                console.log("数据连接成功");
+            }
+            socket.onmessage = function(e){
+                console.log("接收的数据：",e.data);
+            }
+            socket.onclose = function(){
+                console.log("连接关闭");
+            }
+            $input.addEventListener("input",function(){
+                socket.send($input.value);
+            },false);
+        }
+        
+    </script>
+</body>
+</html>

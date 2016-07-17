@@ -2,24 +2,136 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>首页</title>
+    <title>演示首页</title>
 </head>
 <body>
+    <input type="text" name="" v-model="path" id=""><button @click="getTree">搜索</button>
+    <ul class="dir-list">
+        <li v-for="tree in trees">
+            <a v-if="tree.file" @click="selectFile(tree.file)" v-text="tree.file"></a>
+            <a v-else="!tree.file" @click="getChildrenTree(tree.childdir)" v-text="tree.dir"></a>
+        </li>
+    </ul>
+    <script src="/asrc/js/lib/vue.min.js"></script>
+    <script src="/asrc/js/lib/vue-resource.min.js"></script>
     <script>
-        var d = 30;
-        var startIndex = 3;
-        var weeks = Math.ceil(30/7);
-        var count = weeks * 7;
-        var redundant = count - d;
-        var lastCount = redundant - startIndex;
-        var numList = "";
-        var i = 1;
-        while(i <= d){
-            numList += i++;
+        new Vue({
+            el:"body",
+            data:{
+                path:"",
+                trees:[],
+                selectedfile:""
+            },
+            methods:{
+                getTree:function(){
+                    let self = this;
+                    this.$http({
+                        url:"/admin/filetree",
+                        data:{
+                            root:self.path
+                        }
+                    }).then(function(data){
+                        data = data.data;
+                        self.trees = data.trees;
+                    })
+                },
+                getChildrenTree:function(childdir){
+                    this.trees = childdir;
+                },
+                selectFile:function(file){
+                    console.log(file);
+                }
+            }
+        });
+
+        function LinkedList(){
+            var Node = function(element){
+                this.element = element;
+                this.next = null;
+            };
+
+            let length = 0;
+            var head = null;
+            
+            this.append = function(element){
+                var node = new Node(element),
+                    current;
+                if(head === null){
+                    head = node;
+                }else{
+                    current = head;
+                    while(current.next){
+                        current = current.next;
+                    }
+                    current.next = node;
+                }
+                length++;
+            };
+            console.log(head);
+            this.insert = function(position,element){
+                console.log(head);
+                if(position >= 0 && position < length){
+                    var node = new Node(element);
+                    var current = head,
+                        previous,
+                        index = 0;
+                    if(position === 0){
+                        node.next = current;
+                        head = node;
+                    }else{
+                        while(index++ < position){
+                            previous = current;
+                            current = current.next;
+                        }
+                        node.next = current;
+                        previous.next = node;
+                    }
+                    length++;
+                    return true;
+                }else{
+                    return false;
+                }
+            };
+            this.removeAt = function(position){};
+            this.remove = function(element){};
+            this.indexOf = function(element){
+                var current = head,
+                    index = -1;
+                while(current){
+                    if(element === current.element){
+                        return index;
+                    }
+                    index++;
+                    current = current.next;
+                }
+                return -1;
+            };
+            this.isEmpty = function(){};
+            this.size = function(){};
+            this.toString = function(){
+                var current = head,
+                    string = '';
+                while(current){
+                    string += "," + current.element;
+                    current = current.next;
+                }
+                return string.slice(1);
+            };
+            this.print = function(){
+                return ;
+            };
+            this.gethead = function(){
+                return head;
+            }
         }
-        var startStr = Array(startIndex+1).join(0);
-        var endStr = Array(lastCount+1).join(0);
-        console.log(startStr+numList+endStr);
+
+        var list = new LinkedList();
+        list.append(50);
+        list.append(30);
+        list.append(20);
+        list.append(10);
+        list.insert(2,90);
+        // console.log(list.toString());
     </script>
 </body>
 </html>

@@ -9,6 +9,8 @@ a:hover{color: #065679;}
 .clearfix:after{clear: both;}
 .clearfix{*zoom:1;}
 
+input,select,button,textarea{font-family: "Microsoft YaHei","\5FAE\8F6F\96C5\9ED1";}
+
 /*字体*/
 
 @font-face {font-family: "iconfont";

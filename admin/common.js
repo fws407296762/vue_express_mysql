@@ -29,11 +29,11 @@ common.getTimesTamp = function () {
     return '' + year + month + day + hours + minutes + seconds;
 };
 common.errormsg = {
-    "ENOTFOUND":"未找到请求地址",
-    "ETIMEDOUT":"请求超时"
+    "ENOTFOUND": "未找到请求地址",
+    "ETIMEDOUT": "请求超时"
 };
 
-common.getErrormsg = function(err){
+common.getErrormsg = function (err) {
     let errno = err.errno;
     return this.errormsg[errno];
 };
@@ -43,10 +43,10 @@ common.download = function (src) {
     let patt = /[\?\!]\S*$/;
     src = src.replace(patt, "");
     let colonIndex = src.indexOf(":");
-    let agreement = src.substring(0,colonIndex);
+    let agreement = src.substring(0, colonIndex);
     let agreementObj = {
-        "http":http,
-        "https":https
+        "http": http,
+        "https": https
     };
     return new Promise(function (resolve, reject) {
         let dir = 'upload';
@@ -57,20 +57,19 @@ common.download = function (src) {
             getTime = date.getTime();
         dir = dir + "/" + year + "/" + month + "/" + day;
         let filename = '' + year + month + day + getTime;
-        let lastFileDir = src.substring(src.lastIndexOf("/"));
-        let extIndex = lastFileDir.lastIndexOf(".");
-        let ext = extIndex > -1 ? lastFileDir.substring(extIndex) : ".jpg";
+        let lastFileDir = path.basename(src);
+        let ext = path.extname(lastFileDir) || ".jpg";
         self.mkdirsSync(dir);
         let filePath = '/' + dir + '/' + filename + ext;
         let writestream = fs.createWriteStream("." + filePath);
-        console.log("\n"+src);
+        console.log("\n" + src);
         let getRequest = agreementObj[agreement].get(src, function (res) {
             let contentLength = res.headers["content-length"];
             let c = new Buffer(0);
-            res.on("data",function(chunk){
-                c = Buffer.concat([c,chunk]);
-                if(contentLength){
-                    self.progress(c,contentLength);
+            res.on("data", function (chunk) {
+                c = Buffer.concat([c, chunk]);
+                if (contentLength) {
+                    self.progress(c, contentLength);
                 }
             });
             res.on("end", function () {
@@ -79,11 +78,11 @@ common.download = function (src) {
                 resolve(filePath);
             });
         });
-        getRequest.on("error",function(err){
+        getRequest.on("error", function (err) {
             let msg = self.getErrormsg(err);
-            try{
+            try {
                 fs.unlinkSync("." + filePath)
-            }catch(e){
+            } catch (e) {
                 console.log(e);
             }
             reject(msg);
@@ -114,7 +113,7 @@ common.mkdirsSync = function (dir, mode) {
     }
     return true;
 }
-common.progress = function (c,total) {
+common.progress = function (c, total) {
     // console.log(c,total)
     let width = 20;
     let complete = "\033[42m \033[0m";
@@ -129,6 +128,20 @@ common.progress = function (c,total) {
     process.stderr.cursorTo(0);
     process.stderr.write(str + " 已经下载：" + percen.toFixed(1) + "%；已经下载文件大小：" + (clen / 1024 / 1024).toFixed(2) + "MB");
     process.stderr.clearLine(1);
+}
+
+common.sizeConversion = function (size,level) {
+    size = parseFloat(size, 10);
+    if (!size) return false;
+    var unit = ['字节','KB','MB','GB','TB','PB','EB','ZB','YB'];
+    let unitlen = unit.length - 1;
+    if(level > unitlen){
+        return size.toFixed(2) + unit[unitlen];
+    }
+    if(size < 1000){
+        return size.toFixed(2) + unit[level];
+    }
+    return arguments.callee(size / 1024,++level);
 }
 
 module.exports = common;

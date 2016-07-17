@@ -26,7 +26,6 @@
                 <dt>更新日期：</dt>
                 <dd>
                     <input type="text" v-model="datetime" name="" id="" class="form-control">
-                    <!--<v-datepicker></v-datepicker>-->
                 </dd>
             </dl>
             <dl class="edit-item">
@@ -35,6 +34,18 @@
                     <div v-for="imgurl in imageurls" class="imageurl-input-box">
                         <input type="text" v-model="imgurl" name="" id="" class="form-control">
                     </div>
+                </dd>
+            </dl>
+            <dl class="edit-item">
+                <dt>摘要：</dt>
+                <dd>
+                    <textarea name="" class="form-control" v-model="description" id="" cols="30" rows="10"></textarea>
+                </dd>
+            </dl>
+            <dl class="edit-item">
+                <dt>内容：</dt>
+                <dd>
+                    <textarea name="" class="form-control" v-model="description" id="" cols="30" rows="10"></textarea>
                 </dd>
             </dl>
         </div>
@@ -53,17 +64,16 @@
     .edit-item{padding-left: 100px;}
     .edit-item dt{float: left;width: 100px;margin-left: -100px;text-align: right;color: #666;line-height: 2.8571428;}
     .edit-item dd{margin-left: 10px;}
-    input[type="text"].form-control{width: 500px;height: 40px;padding: 10px;border: 1px solid #ddd;color: #333;font-family: "Microsoft YaHei","\5FAE\8F6F\96C5\9ED1";font-size: 14px;}
-    select.form-control{width: 500px;height: 40px;border: 1px solid #ddd;font-family: "Microsoft YaHei","\5FAE\8F6F\96C5\9ED1";font-size: 14px;}
+    input[type="text"].form-control{width: 500px;height: 40px;padding: 10px;border: 1px solid #ddd;color: #333;font-size: 14px;}
+    select.form-control{width: 500px;height: 40px;border: 1px solid #ddd;font-size: 14px;}
     .source-item input[type="text"].form-control:first-of-type{width: 100px;text-align: center;}
     .source-item input[type="text"].form-control:last-of-type{width: 396px;}
     .imageurl-input-box{margin-bottom: 10px;}
+    textarea.form-control{width: 700px;height: 200px;padding: 5px;border: 1px solid #ddd;font-size: 14px;}
 </style>
 <script>
-    import vDatepicker from "../component/vueDatepicker.vue"
     module.exports = {
         components:{
-            vDatepicker:vDatepicker
         },
         data:function(){
             return {
@@ -74,7 +84,8 @@
                 source:"",
                 sourceurl:"",
                 datetime:"",
-                imageurls:[]
+                imageurls:[],
+                description:""
             }
         },
         ready:function(){
@@ -111,6 +122,7 @@
                 self.sourceurl = result.sourceurl;
                 self.datetime = result.datetime;
                 self.imageurls = result.imageurls.split(",");
+                self.description = result.description;
             }).catch(function(err){
                 console.log(err);
             })

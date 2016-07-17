@@ -5,6 +5,7 @@ let router = express.Router();
 const mysqlConnection = require("./mysqlConnection");
 const connection = mysqlConnection.connection;
 const mysqlOptions = mysqlConnection.mysqlOptions;
+const filetree = require("./filetree");
 router.get("/", function (req, res) {
     res.render("index")
 });
@@ -12,6 +13,14 @@ router.get("/", function (req, res) {
 router.get("/demo", function (req, res) {
     res.render("demo")
 });
+router.get("/video", function (req, res) {
+    res.render("video")
+});
+
+router.get("/websocket", function (req, res) {
+    res.render("websocket")
+});
+
 
 router.get("/getChannel",function(req,res){
     queryPromise("USE " + mysqlOptions.database).then(function(){
@@ -91,6 +100,16 @@ router.get("/getNewsOne", function (req, res) {
         res.end();
     })
 });
+
+router.get("/filetree",function(req,res){
+    let query = req.query,
+        root = query.root;
+    let treeData = filetree(root);
+    res.send({
+        trees:[treeData]
+    });
+    res.end();
+})
 
 function queryPromise(options) {
     return new Promise(function (resovle, reject) {
